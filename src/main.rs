@@ -70,7 +70,7 @@ fn print_img <T: io::Write> (img: &core::Mat, out: &mut io::BufWriter<T>) -> Res
 }
 
 fn run(path: &str) -> Result<()> {
-    let mut cam = match path.parse::<i32>() {
+    let mut cam = match path.parse() {
         Ok(num) => videoio::VideoCapture::new(num, videoio::CAP_ANY)?,
         Err(_) => videoio::VideoCapture::from_file(path, videoio::CAP_ANY)?,
     };
@@ -112,7 +112,8 @@ fn run(path: &str) -> Result<()> {
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
-        panic!("No src");
+        println!("No src.");
+        return
     }
     if env::var("PRINTI_DEBUG").is_err() {
         suppress_stderr();
