@@ -1,5 +1,8 @@
 # printimg-rust
 
+[![crates.io](https://img.shields.io/crates/v/printimg.svg)](https://crates.io/crates/printimg/)
+[![crates.io](https://img.shields.io/crates/d/printimg)](https://crates.io/crates/printimg/)
+
 Print an imgae or an video in terminal using OpenCV 4.  
 Currently Linux is only supported.
 
