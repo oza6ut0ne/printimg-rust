@@ -1,14 +1,21 @@
 # cargo-features = ["strip"]
 
 [package]
-name = "printi"
+name = "printimg"
 version = "0.1.0"
+authors = ["Ryota Okimatsu <oza6ut0ne@gmail.com>"]
+description = "Print an imgae or a video in terminal."
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/oza6ut0ne/printimg-rust"
+readme = "README.md"
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [profile.release]
 # strip = "symbols"
+
+[[bin]]
+name = "printi"
+path = "src/main.rs"
 
 [dependencies]
 anyhow = "1.0.32"
