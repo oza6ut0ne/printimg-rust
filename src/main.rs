@@ -13,6 +13,8 @@ use opencv::{
     videoio,
 };
 
+const DEFAULT_TERMINAL_SIZE: (i32, i32) = (80, 24);
+
 fn get_terminal_size() -> Option<(i32, i32)> {
     let fd = match File::open("/dev/tty") {
         Ok(file) => file.into_raw_fd(),
@@ -48,7 +50,7 @@ fn calc_resized_img_size(img_w: i32, img_h: i32, term_w: i32, term_h: i32) -> (i
 
 fn resize_img(img: &core::Mat) -> Result<core::Mat> {
     let size = img.size()?;
-    let (term_w, term_h) = get_terminal_size().unwrap_or((80, 24));
+    let (term_w, term_h) = get_terminal_size().unwrap_or(DEFAULT_TERMINAL_SIZE);
     let (w, h) = calc_resized_img_size(size.width, size.height, term_w, term_h);
 
     let mut resized = core::Mat::default()?;
