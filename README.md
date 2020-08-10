@@ -6,7 +6,7 @@
 Print an imgae or an video in terminal using OpenCV.  
 Currently only Linux is supported.
 
-![ferris](https://raw.githubusercontent.com/oza6ut0ne/printimg-rust/v0.1.0/pic/ferris.png)
+![ferris](https://raw.githubusercontent.com/oza6ut0ne/printimg-rust/v0.2.0/pic/ferris.png)
 
 ## Installation
 
