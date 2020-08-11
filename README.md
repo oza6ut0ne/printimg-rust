@@ -26,7 +26,7 @@ $ cargo install printimg --no-default-features --features opencv-32
 
 ### Other (Use Docker)
 
-Multi-architecture [docker image](https://hub.docker.com/repository/docker/oza6ut0ne/opencv) is available.
+Multi-architecture [docker image](https://hub.docker.com/r/oza6ut0ne/opencv) is available.
 
 ```sh
 $ docker pull oza6ut0ne/opencv:4.3.0  # already installed in the image!
