@@ -13,14 +13,14 @@ Currently only Linux is supported.
 ### Ubuntu 20.04
 
 ```sh
-$ sudo apt install libopencv-dev clang clang-dev
+$ sudo apt install libopencv-dev clang libclang-dev
 $ cargo install printimg
 ```
 
 ### Ubuntu 18.04
 
 ```sh
-$ sudo apt install libopencv-dev clang clang-dev
+$ sudo apt install libopencv-dev clang libclang-dev
 $ cargo install printimg --no-default-features --features opencv-32
 ```
 
