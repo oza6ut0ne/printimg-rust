@@ -3,7 +3,7 @@
 [![crates.io](https://img.shields.io/crates/v/printimg.svg)](https://crates.io/crates/printimg/)
 [![crates.io](https://img.shields.io/crates/d/printimg)](https://crates.io/crates/printimg/)
 
-Print an imgae or an video in terminal using OpenCV.  
+Print an image or a video in terminal using OpenCV.
 Currently only Linux is supported.
 
 ![ferris](https://raw.githubusercontent.com/oza6ut0ne/printimg-rust/v0.2.1/pic/ferris.png)
