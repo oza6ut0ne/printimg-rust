@@ -53,7 +53,7 @@ fn resize_img(img: &core::Mat) -> Result<core::Mat> {
     let (term_w, term_h) = get_terminal_size().unwrap_or(DEFAULT_TERMINAL_SIZE);
     let (w, h) = calc_resized_img_size(size.width, size.height, term_w, term_h);
 
-    let mut resized = core::Mat::default()?;
+    let mut resized = core::Mat::default();
     imgproc::resize(img, &mut resized, core::Size::new(w, h),
                     0f64, 0f64, imgproc::INTER_LINEAR)?;
     Ok(resized)
@@ -94,7 +94,7 @@ fn run(path: &str) -> Result<()> {
 
     let mut first_frame = true;
     while ! killed.load(Ordering::SeqCst) {
-        let mut img = core::Mat::default()?;
+        let mut img = core::Mat::default();
         if ! cam.read(&mut img)? {
             break;
         }

@@ -27,4 +27,4 @@ opencv-32 = ["opencv/opencv-32", "opencv/buildtime-bindgen"]
 anyhow = "1.0.32"
 ctrlc = "3.1.5"
 libc = "0.2.73"
-opencv = { version = "0.49.1", default-features = false }
+opencv = { version = "0.52.0", default-features = false }
