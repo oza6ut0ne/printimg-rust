@@ -70,7 +70,7 @@ fn run(path: &str) -> Result<()> {
         return Err(anyhow!("Unable to open src."));
     }
 
-    if cam.get(videoio::CAP_PROP_FRAME_COUNT)? > 1f64 {
+    if cam.get(videoio::CAP_PROP_FRAME_COUNT)? != 1f64 {
         if let Ok((_, y)) = cursor::position() {
             io::stdout().execute(terminal::ScrollUp(y))?;
             print!("\x1b[1;1H");
