@@ -1,4 +1,4 @@
-use std::{env, fs::File, os::unix::io::IntoRawFd};
+use std::env;
 use std::io::{self, Write};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -6,13 +6,14 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use anyhow::{anyhow, Result};
 use crossterm::{cursor, ExecutableCommand, terminal};
 use ctrlc;
-use libc::{dup2, STDERR_FILENO};
 use opencv::{
     core,
     imgproc,
     prelude::*,
     videoio,
 };
+
+mod util;
 
 const DEFAULT_TERMINAL_SIZE: (i32, i32) = (80, 24);
 
@@ -21,14 +22,6 @@ fn get_terminal_size() -> Option<(i32, i32)> {
         Ok((col, row)) => Some((col as i32, row as i32)),
         Err(_) => None
     }
-}
-
-fn suppress_stderr() {
-    let fd = match File::create("/dev/null") {
-        Ok(file) => file.into_raw_fd(),
-        Err(_) => return
-    };
-    unsafe { dup2(fd, STDERR_FILENO) };
 }
 
 fn calc_resized_img_size(img_w: i32, img_h: i32, term_w: i32, term_h: i32) -> (i32, i32) {
@@ -122,7 +115,7 @@ fn main() {
         return
     }
     if env::var("PRINTI_DEBUG").is_err() {
-        suppress_stderr();
+        util::suppress_stderr();
     }
     print!("\x1b[?25l");
     if let Err(e) = run(&args[1]) {
