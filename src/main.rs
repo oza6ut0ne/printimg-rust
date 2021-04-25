@@ -1,4 +1,4 @@
-use std::{env, fs::File, mem, os::unix::io::IntoRawFd};
+use std::{env, fs::File, os::unix::io::IntoRawFd};
 use std::io::{self, Write};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -6,7 +6,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use anyhow::{anyhow, Result};
 use crossterm::{cursor, ExecutableCommand, terminal};
 use ctrlc;
-use libc::{dup2, ioctl, STDERR_FILENO, TIOCGWINSZ, winsize};
+use libc::{dup2, STDERR_FILENO};
 use opencv::{
     core,
     imgproc,
@@ -17,16 +17,9 @@ use opencv::{
 const DEFAULT_TERMINAL_SIZE: (i32, i32) = (80, 24);
 
 fn get_terminal_size() -> Option<(i32, i32)> {
-    let fd = match File::open("/dev/tty") {
-        Ok(file) => file.into_raw_fd(),
-        Err(_) => STDERR_FILENO
-    };
-
-    let mut ws: winsize = unsafe { mem::zeroed() };
-    if unsafe { ioctl(fd, TIOCGWINSZ, &mut ws) } == -1 {
-        None
-    } else {
-        Some((ws.ws_col as i32, ws.ws_row as i32))
+    match terminal::size() {
+        Ok((col, row)) => Some((col as i32, row as i32)),
+        Err(_) => None
     }
 }
 
