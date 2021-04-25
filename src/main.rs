@@ -4,6 +4,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use anyhow::{anyhow, Result};
+use crossterm::{cursor, ExecutableCommand, terminal};
 use ctrlc;
 use libc::{dup2, ioctl, STDERR_FILENO, TIOCGWINSZ, winsize};
 use opencv::{
@@ -81,6 +82,13 @@ fn run(path: &str) -> Result<()> {
     };
     if ! videoio::VideoCapture::is_opened(&cam)? {
         return Err(anyhow!("Unable to open src."));
+    }
+
+    if cam.get(videoio::CAP_PROP_FRAME_COUNT)? > 1f64 {
+        if let Ok((_, y)) = cursor::position() {
+            io::stdout().execute(terminal::ScrollUp(y))?;
+            print!("\x1b[1;1H");
+        }
     }
 
     let out = io::stdout();
