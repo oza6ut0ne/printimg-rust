@@ -3,8 +3,8 @@
 [![crates.io](https://img.shields.io/crates/v/printimg.svg)](https://crates.io/crates/printimg/)
 [![crates.io](https://img.shields.io/crates/d/printimg)](https://crates.io/crates/printimg/)
 
-Print an image or a video in terminal using OpenCV.
-Currently only Linux is supported.
+Print an image or a video in terminal using OpenCV.  
+Currently Linux is supported.
 
 ![ferris](https://raw.githubusercontent.com/oza6ut0ne/printimg-rust/v0.2.1/pic/ferris.png)
 
@@ -21,7 +21,7 @@ $ cargo install printimg
 
 ```sh
 $ sudo apt install libopencv-dev clang libclang-dev
-$ cargo install printimg --no-default-features --features opencv-32
+$ cargo install printimg --features opencv-32
 ```
 
 ### Other (Use Docker)
@@ -32,7 +32,14 @@ Multi-architecture [docker image](https://hub.docker.com/r/oza6ut0ne/opencv) is 
 $ docker pull oza6ut0ne/opencv:4.3.0  # already installed in the image!
 ```
 
-### Usage
+### Windows (experimental)
+1. Install OpenCV and LLVM with chocolatey and set environment variables.  
+(See [README.md of `twistedfall/opencv-rust`](https://github.com/twistedfall/opencv-rust/tree/v0.53.1#windows-package))
+1. Then, install with `cargo`.
+    ```cmd
+    cargo install printimg
+    ```
+## Usage
 
 ```sh
 # print image.
