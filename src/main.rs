@@ -5,7 +5,6 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use anyhow::{anyhow, Result};
 use crossterm::{cursor, ExecutableCommand, terminal};
-use ctrlc;
 use opencv::{
     core,
     imgproc,
@@ -53,7 +52,7 @@ fn print_img <T: io::Write> (img: &core::Mat, out: &mut io::BufWriter<T>) -> Res
             let val = img.at_2d::<core::Vec3b>(y, x)?;
             write!(out, "\x1b[48;2;{};{};{}m  ", val[2], val[1], val[0])?;
         }
-        out.write(b"\x1b[0m\n")?;
+        out.write_all(b"\x1b[0m\n")?;
     }
     Ok(())
 }
@@ -70,7 +69,7 @@ fn run(path: &str) -> Result<()> {
         return Err(anyhow!("Unable to open src."));
     }
 
-    if cam.get(videoio::CAP_PROP_FRAME_COUNT)? != 1f64 {
+    if (cam.get(videoio::CAP_PROP_FRAME_COUNT)? - 1f64).abs() > f64::EPSILON {
         if let Ok((_, y)) = cursor::position() {
             io::stdout().execute(terminal::ScrollUp(y))?;
             print!("\x1b[1;1H");
@@ -101,7 +100,7 @@ fn run(path: &str) -> Result<()> {
         if first_frame {
             first_frame = false;
         } else {
-            out.write(b"\x1b[1;1H")?;
+            out.write_all(b"\x1b[1;1H")?;
         }
         print_img(&resized, &mut out)?;
     }
