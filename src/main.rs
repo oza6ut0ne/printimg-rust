@@ -88,5 +88,5 @@ fn main() {
     if let Err(e) = run(opt) {
         println!("{:?}", e);
     }
-    println!("\x1b[?25h\x1b[0m");
+    print!("\x1b[?25h\x1b[0m");
 }
