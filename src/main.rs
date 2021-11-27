@@ -41,7 +41,7 @@ fn run(opt: cli::Opt) -> Result<()> {
 
     let out = io::stdout();
     let mut out = io::BufWriter::new(out.lock());
-    let resizer = ResizerFactory::create(&false, &opt.flat);
+    let resizer = ResizerFactory::create(&opt.protrude, &opt.flat);
     let printer = PrinterFactory::create(&opt.flat);
 
     let killed = Arc::new(AtomicBool::new(false));
@@ -57,10 +57,16 @@ fn run(opt: cli::Opt) -> Result<()> {
             break;
         }
 
+        if opt.rotate {
+            let mut rotated = core::Mat::default();
+            core::rotate(&img, &mut rotated, core::ROTATE_90_COUNTERCLOCKWISE)?;
+            img = rotated;
+        }
+
+        let resized = resizer.resize_img(&img)?;
         if img.typ()? == core::CV_8UC1 {
             imgproc::cvt_color(&img.clone(), &mut img, imgproc::COLOR_GRAY2BGR, 0)?;
         }
-        let resized = resizer.resize_img(&img)?;
 
         if first_frame {
             first_frame = false;

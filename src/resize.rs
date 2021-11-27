@@ -8,11 +8,11 @@ const DEFAULT_TERMINAL_SIZE: (i32, i32) = (80, 24);
 pub struct ResizerFactory;
 
 impl ResizerFactory {
-    pub fn create(_protrude: &bool, flat: &bool) -> Box<dyn Resizer> {
+    pub fn create(protrude: &bool, flat: &bool) -> Box<dyn Resizer> {
         if *flat {
-            Box::new(FlatResizer)
+            Box::new(FlatResizer { protrude: protrude.to_owned() })
         } else {
-            Box::new(SuperResolutionResizer)
+            Box::new(SuperResolutionResizer { protrude: protrude.to_owned() })
         }
     }
 }
@@ -41,13 +41,20 @@ pub trait Resizer {
 }
 
 
-struct FlatResizer;
+struct FlatResizer {
+    protrude: bool,
+}
 
 impl Resizer for FlatResizer {
     fn calc_resized_img_size(&self, img_w: i32, img_h: i32, term_w: i32, term_h: i32) -> (i32, i32) {
         let term_h = term_h - 2;
-        let mut h = term_h;
-        let mut w = img_w * term_h / img_h;
+        let mut h = img_h;
+        let mut w = img_w;
+
+        if ! self.protrude {
+            h = term_h;
+            w = img_w * term_h / img_h;
+        }
         if (term_w / 2) < w {
             h = h * term_w / 2 / w;
             w = term_w / 2;
@@ -57,13 +64,20 @@ impl Resizer for FlatResizer {
 }
 
 
-struct SuperResolutionResizer;
+struct SuperResolutionResizer {
+    protrude: bool,
+}
 
 impl Resizer for SuperResolutionResizer {
     fn calc_resized_img_size(&self, img_w: i32, img_h: i32, term_w: i32, term_h: i32) -> (i32, i32) {
         let term_h = term_h * 2 - 2;
-        let mut h = term_h;
-        let mut w = img_w * term_h / img_h;
+        let mut h = img_h;
+        let mut w = img_w;
+
+        if ! self.protrude {
+            h = term_h;
+            w = img_w * term_h / img_h;
+        }
         if term_w < w {
             h = h * term_w / w;
             w = term_w;
