@@ -10,7 +10,7 @@ repository = "https://github.com/oza6ut0ne/printimg-rust"
 categories = ["command-line-utilities", "multimedia::images", "multimedia::video"]
 keywords = ["terminal", "opencv"]
 readme = "README.md"
-edition = "2018"
+edition = "2021"
 
 [profile.release]
 # strip = "symbols"
