@@ -2,7 +2,7 @@ use std::io::{self, Write};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use anyhow::{anyhow, Result};
+use anyhow::{bail, Result};
 use crossterm::{cursor, ExecutableCommand, terminal};
 use opencv::{
     core,
@@ -29,7 +29,7 @@ fn run(opt: cli::Opt) -> Result<()> {
         Err(_) => videoio::VideoCapture::from_file(&opt.path, videoio::CAP_ANY)?,
     };
     if ! videoio::VideoCapture::is_opened(&cam)? {
-        return Err(anyhow!("Unable to open src."));
+        bail!("Unable to open src.");
     }
 
     if (cam.get(videoio::CAP_PROP_FRAME_COUNT)? - 1f64).abs() > f64::EPSILON {
