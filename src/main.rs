@@ -64,7 +64,7 @@ fn run(opt: cli::Opt) -> Result<()> {
         }
 
         let resized = resizer.resize_img(&img)?;
-        if img.typ()? == core::CV_8UC1 {
+        if img.typ() == core::CV_8UC1 {
             imgproc::cvt_color(&img.clone(), &mut img, imgproc::COLOR_GRAY2BGR, 0)?;
         }
 
