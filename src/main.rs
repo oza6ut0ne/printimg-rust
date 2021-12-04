@@ -78,8 +78,10 @@ fn run(opt: cli::Opt) -> Result<()> {
         }
         printer.print_img(&resized, &mut out)?;
     }
+    out.flush()?;
 
     print!("\x1b[?25h\x1b[0m");
+    io::stdout().flush()?;
     Ok(())
 }
 
