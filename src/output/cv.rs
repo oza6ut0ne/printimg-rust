@@ -1,30 +1,13 @@
-use std::{
-    io::{BufWriter, Write},
-    marker::PhantomData,
-};
+use std::io::{BufWriter, Write};
 
 use anyhow::Result;
 use opencv::{core, prelude::*};
-
-pub struct PrinterFactory<T> {
-    _marker: PhantomData<fn() -> T>,
-}
-
-impl<T: Write> PrinterFactory<T> {
-    pub fn create(flat: &bool) -> Box<dyn Printer<T>> {
-        if *flat {
-            Box::new(FlatPrinter)
-        } else {
-            Box::new(SuperResolutionPrinter)
-        }
-    }
-}
 
 pub trait Printer<T: Write> {
     fn print_img(&self, img: &core::Mat, out: &mut BufWriter<T>) -> Result<()>;
 }
 
-struct FlatPrinter;
+pub struct FlatPrinter;
 
 impl<T: Write> Printer<T> for FlatPrinter {
     fn print_img(&self, img: &core::Mat, out: &mut BufWriter<T>) -> Result<()> {
@@ -40,7 +23,7 @@ impl<T: Write> Printer<T> for FlatPrinter {
     }
 }
 
-struct SuperResolutionPrinter;
+pub struct SuperResolutionPrinter;
 
 impl<T: Write> Printer<T> for SuperResolutionPrinter {
     fn print_img(&self, img: &core::Mat, out: &mut BufWriter<T>) -> Result<()> {

@@ -18,10 +18,12 @@ pub struct Opt {
     #[structopt(short, long)]
     pub flat: bool,
 
+    /// Do not suppress standard error output
+    #[cfg(feature = "opencv")]
     #[structopt(short, long)]
     pub verbose: bool,
 
-    /// Prints build information of OpenCV
+    /// Prints build information
     #[structopt(short, long, conflicts_with = "PATH")]
     pub build_info: bool,
 }
