@@ -37,7 +37,7 @@ fn run(opt: cli::Opt) -> Result<()> {
     if opt.build_info {
         println!("{} {}\n", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
         print!("Built with OpenCV");
-        println!("{}", core::get_build_information().unwrap());
+        println!("{}", core::get_build_information()?);
         return Ok(());
     }
 
@@ -46,19 +46,19 @@ fn run(opt: cli::Opt) -> Result<()> {
     }
 
     let path = opt.path.ok_or_else(|| anyhow!(USAGE))?;
-    let mut cam = match path.parse() {
+    let mut cap = match path.parse() {
         #[cfg(feature = "opencv-32")]
         Ok(num) => videoio::VideoCapture::new_default(num)?,
         #[cfg(not(feature = "opencv-32"))]
         Ok(num) => videoio::VideoCapture::new(num, videoio::CAP_ANY)?,
         Err(_) => videoio::VideoCapture::from_file(&path, videoio::CAP_ANY)?,
     };
-    if !videoio::VideoCapture::is_opened(&cam)? {
+    if !videoio::VideoCapture::is_opened(&cap)? {
         bail!("Unable to open src.");
     }
 
     print!("\x1b[?25l");
-    if (cam.get(videoio::CAP_PROP_FRAME_COUNT)? - 1f64).abs() > f64::EPSILON {
+    if (cap.get(videoio::CAP_PROP_FRAME_COUNT)? - 1f64).abs() > f64::EPSILON {
         if let Ok((_, y)) = cursor::position() {
             io::stdout().execute(terminal::ScrollUp(y))?;
             print!("\x1b[1;1H");
@@ -79,7 +79,7 @@ fn run(opt: cli::Opt) -> Result<()> {
     let mut first_frame = true;
     while !killed.load(Ordering::SeqCst) {
         let mut img = core::Mat::default();
-        if !cam.read(&mut img)? {
+        if !cap.read(&mut img)? {
             break;
         }
 
