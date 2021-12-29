@@ -14,8 +14,13 @@ impl<T: Write> Printer<T> for FlatPrinter {
         let size = img.size()?;
         for y in 0..size.height {
             for x in 0..size.width {
-                let val = img.at_2d::<core::Vec3b>(y, x)?;
-                write!(out, "\x1b[48;2;{};{};{}m  ", val[2], val[1], val[0])?;
+                if img.typ() == core::CV_8UC1 {
+                    let val = img.at_2d::<u8>(y, x)?;
+                    write!(out, "\x1b[48;2;{};{};{}m  ", val, val, val)?;
+                } else {
+                    let val = img.at_2d::<core::Vec3b>(y, x)?;
+                    write!(out, "\x1b[48;2;{};{};{}m  ", val[2], val[1], val[0])?;
+                }
             }
             out.write_all(b"\x1b[0m\n")?;
         }
@@ -30,13 +35,23 @@ impl<T: Write> Printer<T> for SuperResolutionPrinter {
         let size = img.size()?;
         for y in (0..size.height - 1).step_by(2) {
             for x in 0..size.width {
-                let upper = img.at_2d::<core::Vec3b>(y, x)?;
-                let lower = img.at_2d::<core::Vec3b>(y + 1, x)?;
-                write!(
-                    out,
-                    "\x1b[38;2;{};{};{}m\x1b[48;2;{};{};{}m▀",
-                    upper[2], upper[1], upper[0], lower[2], lower[1], lower[0],
-                )?;
+                if img.typ() == core::CV_8UC1 {
+                    let upper = img.at_2d::<u8>(y, x)?;
+                    let lower = img.at_2d::<u8>(y + 1, x)?;
+                    write!(
+                        out,
+                        "\x1b[38;2;{};{};{}m\x1b[48;2;{};{};{}m▀",
+                        upper, upper, upper, lower, lower, lower,
+                    )?;
+                } else {
+                    let upper = img.at_2d::<core::Vec3b>(y, x)?;
+                    let lower = img.at_2d::<core::Vec3b>(y + 1, x)?;
+                    write!(
+                        out,
+                        "\x1b[38;2;{};{};{}m\x1b[48;2;{};{};{}m▀",
+                        upper[2], upper[1], upper[0], lower[2], lower[1], lower[0],
+                    )?;
+                }
             }
             out.write_all(b"\x1b[0m\n")?;
         }

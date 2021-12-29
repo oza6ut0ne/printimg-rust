@@ -27,12 +27,13 @@ fn restore_cursor() -> Result<()> {
 
 #[cfg(feature = "opencv")]
 fn run(opt: cli::Opt) -> Result<()> {
+    use std::mem::ManuallyDrop;
     use std::sync::atomic::{AtomicBool, Ordering};
     use std::sync::Arc;
 
     use anyhow::bail;
     use crossterm::{cursor, terminal, ExecutableCommand};
-    use opencv::{core, imgproc, prelude::*, videoio};
+    use opencv::{core, prelude::*, videoio};
 
     if opt.build_info {
         println!("{} {}\n", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
@@ -80,26 +81,30 @@ fn run(opt: cli::Opt) -> Result<()> {
         1 => Some(core::ROTATE_90_COUNTERCLOCKWISE),
         2 => Some(core::ROTATE_180),
         3 => Some(core::ROTATE_90_CLOCKWISE),
-        _ => None
+        _ => None,
     };
 
     let mut first_frame = true;
+    let mut img = core::Mat::default();
+    let mut rotated = core::Mat::default();
+    let mut resized = core::Mat::default();
     while !killed.load(Ordering::SeqCst) {
-        let mut img = core::Mat::default();
         if !cap.read(&mut img)? {
             break;
         }
 
-        if let Some(rotate_code) = rotate_code {
-            let mut rotated = core::Mat::default();
-            core::rotate(&img, &mut rotated, rotate_code)?;
-            img = rotated;
-        }
+        let ptr = match rotate_code {
+            Some(rotate_code) => {
+                core::rotate(&img, &mut rotated, rotate_code)?;
+                rotated.as_raw_mut()
+            }
+            _ => img.as_raw_mut(),
+        };
 
-        let resized = resizer.resize_img(&img)?;
-        if img.typ() == core::CV_8UC1 {
-            imgproc::cvt_color(&img.clone(), &mut img, imgproc::COLOR_GRAY2BGR, 0)?;
-        }
+        // Avoid cloning or moving Mat by creating from the raw pointer.
+        // Also wrapping with ManuallyDrop to avoid double-freeing original Mat.
+        let tmp = ManuallyDrop::new(unsafe { core::Mat::from_raw(ptr) });
+        resizer.resize_img(&tmp, &mut resized)?;
 
         if first_frame {
             first_frame = false;

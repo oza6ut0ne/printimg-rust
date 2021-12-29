@@ -33,21 +33,20 @@ pub trait Resizer {
     }
 
     #[cfg(feature = "opencv")]
-    fn resize_img(&self, img: &core::Mat) -> Result<core::Mat> {
+    fn resize_img(&self, img: &core::Mat, resized: &mut core::Mat) -> Result<()> {
         let size = img.size()?;
         let (term_w, term_h) = self.get_terminal_size().unwrap_or(DEFAULT_TERMINAL_SIZE);
         let (w, h) = self.calc_resized_img_size(size.width, size.height, term_w, term_h);
 
-        let mut resized = core::Mat::default();
         imgproc::resize(
             img,
-            &mut resized,
+            resized,
             core::Size::new(w, h),
             0f64,
             0f64,
             imgproc::INTER_NEAREST,
         )?;
-        Ok(resized)
+        Ok(())
     }
 
     #[cfg(not(feature = "opencv"))]
