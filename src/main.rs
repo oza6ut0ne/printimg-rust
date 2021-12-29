@@ -27,7 +27,6 @@ fn restore_cursor() -> Result<()> {
 
 #[cfg(feature = "opencv")]
 fn run(opt: cli::Opt) -> Result<()> {
-    use std::mem::ManuallyDrop;
     use std::sync::atomic::{AtomicBool, Ordering};
     use std::sync::Arc;
 
@@ -93,18 +92,13 @@ fn run(opt: cli::Opt) -> Result<()> {
             break;
         }
 
-        let ptr = match rotate_code {
-            Some(rotate_code) => {
-                core::rotate(&img, &mut rotated, rotate_code)?;
-                rotated.as_raw_mut()
-            }
-            _ => img.as_raw_mut(),
+        let tmp = if let Some(rotate_code) = rotate_code {
+            core::rotate(&img, &mut rotated, rotate_code)?;
+            &rotated
+        } else {
+            &img
         };
-
-        // Avoid cloning or moving Mat by creating from the raw pointer.
-        // Also wrapping with ManuallyDrop to avoid double-freeing original Mat.
-        let tmp = ManuallyDrop::new(unsafe { core::Mat::from_raw(ptr) });
-        resizer.resize_img(&tmp, &mut resized)?;
+        resizer.resize_img(tmp, &mut resized)?;
 
         if first_frame {
             first_frame = false;
