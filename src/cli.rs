@@ -6,9 +6,9 @@ pub struct Opt {
     #[structopt(name = "PATH")]
     pub path: Option<String>,
 
-    /// Rotate counterclockwise
-    #[structopt(short, long)]
-    pub rotate: bool,
+    /// Rotate counterclockwise (-r, -rr, -rrr)
+    #[structopt(short, long, parse(from_occurrences))]
+    pub rotate: u8,
 
     /// Disable limit on image height
     #[structopt(short, long)]

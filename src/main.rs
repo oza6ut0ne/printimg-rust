@@ -76,6 +76,13 @@ fn run(opt: cli::Opt) -> Result<()> {
     let resizer = ResizerFactory::create(opt.protrude, opt.flat);
     let printer = PrinterFactory::create(opt.flat);
 
+    let rotate_code = match opt.rotate % 4 {
+        1 => Some(core::ROTATE_90_COUNTERCLOCKWISE),
+        2 => Some(core::ROTATE_180),
+        3 => Some(core::ROTATE_90_CLOCKWISE),
+        _ => None
+    };
+
     let mut first_frame = true;
     while !killed.load(Ordering::SeqCst) {
         let mut img = core::Mat::default();
@@ -83,9 +90,9 @@ fn run(opt: cli::Opt) -> Result<()> {
             break;
         }
 
-        if opt.rotate {
+        if let Some(rotate_code) = rotate_code {
             let mut rotated = core::Mat::default();
-            core::rotate(&img, &mut rotated, core::ROTATE_90_COUNTERCLOCKWISE)?;
+            core::rotate(&img, &mut rotated, rotate_code)?;
             img = rotated;
         }
 
@@ -123,8 +130,11 @@ fn run(opt: cli::Opt) -> Result<()> {
     let resizer = ResizerFactory::create(opt.protrude, opt.flat);
     let printer = PrinterFactory::create(opt.flat);
 
-    if opt.rotate {
-        img = img.rotate270();
+    match opt.rotate % 4 {
+        1 => img = img.rotate270(),
+        2 => img = img.rotate180(),
+        3 => img = img.rotate90(),
+        _ => { /* nop. */ }
     }
 
     let resized = resizer.resize_img(&img)?;
