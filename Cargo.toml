@@ -2,7 +2,7 @@
 
 [package]
 name = "printimg"
-version = "0.5.1"
+version = "0.5.2"
 authors = ["Ryota Okimatsu <oza6ut0ne@gmail.com>"]
 description = "Print an imgae or a video in terminal."
 license = "MIT OR Apache-2.0"
