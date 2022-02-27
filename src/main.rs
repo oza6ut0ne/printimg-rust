@@ -3,7 +3,7 @@ use std::io::{self, Write};
 use anyhow::{anyhow, Result};
 use output::PrinterFactory;
 use resize::ResizerFactory;
-use structopt::StructOpt as _;
+use clap::Parser as _;
 
 mod cli;
 mod output;
@@ -150,7 +150,7 @@ fn run(opt: cli::Opt) -> Result<()> {
 }
 
 fn main() -> Result<()> {
-    let opt = cli::Opt::from_args();
+    let opt = cli::Opt::parse();
 
     if let Err(e) = run(opt) {
         println!("{:?}", e);

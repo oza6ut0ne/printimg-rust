@@ -1,29 +1,29 @@
-use structopt::{clap::AppSettings::DeriveDisplayOrder, StructOpt};
+use clap::{AppSettings::DeriveDisplayOrder, Parser};
 
-#[derive(StructOpt)]
-#[structopt(name = "printimg", setting(DeriveDisplayOrder))]
+#[derive(Parser)]
+#[clap(name = "printimg", version, setting(DeriveDisplayOrder))]
 pub struct Opt {
-    #[structopt(name = "PATH")]
+    #[clap(name = "PATH")]
     pub path: Option<String>,
 
     /// Rotate counterclockwise (-r, -rr, -rrr)
-    #[structopt(short, long, parse(from_occurrences))]
+    #[clap(short, long, parse(from_occurrences))]
     pub rotate: u8,
 
     /// Disable limit on image height
-    #[structopt(short, long)]
+    #[clap(short, long)]
     pub protrude: bool,
 
     /// Disable super resolution
-    #[structopt(short, long)]
+    #[clap(short, long)]
     pub flat: bool,
 
     /// Do not suppress standard error output
     #[cfg(feature = "opencv")]
-    #[structopt(short, long)]
+    #[clap(short, long)]
     pub verbose: bool,
 
     /// Prints build information
-    #[structopt(short, long, conflicts_with = "PATH")]
+    #[clap(short, long, conflicts_with = "PATH")]
     pub build_info: bool,
 }
