@@ -5,7 +5,7 @@
 
 Print an image or a video in terminal.  
 
-![ferris](https://raw.githubusercontent.com/oza6ut0ne/printimg-rust/v0.5.2/pic/ferris.png)
+![ferris](https://raw.githubusercontent.com/oza6ut0ne/printimg-rust/v0.5.3/pic/ferris.png)
 
 ## Installation (build manually with OpenCV)
 
@@ -21,14 +21,6 @@ $ cargo install printimg
 ```sh
 $ sudo apt install libopencv-dev clang libclang-dev
 $ cargo install printimg --features opencv-32
-```
-
-### Other (Use Docker)
-
-Multi-architecture [docker image](https://hub.docker.com/r/oza6ut0ne/opencv) is available.
-
-```sh
-$ docker pull oza6ut0ne/opencv:4.3.0  # already installed in the image!
 ```
 
 ### Windows (experimental)
