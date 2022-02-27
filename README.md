@@ -5,7 +5,7 @@
 
 Print an image or a video in terminal.  
 
-![ferris](https://raw.githubusercontent.com/oza6ut0ne/printimg-rust/v0.5.4/pic/ferris.png)
+![ferris](https://raw.githubusercontent.com/oza6ut0ne/printimg-rust/v0.5.5/pic/ferris.png)
 
 ## Installation (build manually with OpenCV)
 
