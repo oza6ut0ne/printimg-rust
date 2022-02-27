@@ -30,7 +30,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           use-cross: ${{ matrix.job.use-cross }}
-          command: rustc
+          command: build
           args: --release --target ${{ matrix.job.target }} --no-default-features --features image
       - name: Rename artifacts
         if: startsWith( matrix.job.os, 'windows') != true
