@@ -9,7 +9,7 @@ Print an image or a video in terminal.
 
 ## Installation (build manually with OpenCV)
 
-### Ubuntu 20.04
+### Ubuntu 20.04 or above
 
 ```sh
 $ sudo apt install libopencv-dev clang libclang-dev
