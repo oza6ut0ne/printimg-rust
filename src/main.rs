@@ -1,9 +1,9 @@
 use std::io::{self, Write};
 
 use anyhow::{anyhow, Result};
+use clap::Parser as _;
 use output::PrinterFactory;
 use resize::ResizerFactory;
-use clap::Parser as _;
 
 mod cli;
 mod output;
@@ -39,6 +39,13 @@ fn run(opt: cli::Opt) -> Result<()> {
         print!("Built with OpenCV");
         println!("{}", core::get_build_information()?);
         return Ok(());
+    }
+
+    if let Some(gst_plugin_path) = option_env!("GST_PLUGIN_SYSTEM_PATH_1_0") {
+        // For Nix
+        if std::env::var_os("GST_PLUGIN_SYSTEM_PATH_1_0").is_none() {
+            std::env::set_var("GST_PLUGIN_SYSTEM_PATH_1_0", gst_plugin_path)
+        }
     }
 
     if !opt.verbose {
