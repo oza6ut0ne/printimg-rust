@@ -32,20 +32,34 @@
         GST_PLUGIN_SYSTEM_PATH_1_0 = with pkgs.gst_all_1;
           "${gstreamer.out}/lib/gstreamer-1.0:${gst-plugins-base}/lib/gstreamer-1.0:${gst-plugins-good}/lib/gstreamer-1.0";
       in {
-        packages.default = rustPlatform.buildRustPackage {
-          inherit buildInputs nativeBuildInputs;
-          inherit GST_PLUGIN_SYSTEM_PATH_1_0;
+        packages = rec {
+          default = bin;
 
-          name = "printimg";
-          src = ./.;
-          version = self.shortRev or "dev";
+          bin = rustPlatform.buildRustPackage {
+            inherit buildInputs nativeBuildInputs;
+            inherit GST_PLUGIN_SYSTEM_PATH_1_0;
 
-          cargoLock = {
-            lockFile = ./Cargo.lock;
-            allowBuiltinFetchGit = true;
+            name = "printimg";
+            src = ./.;
+            version = self.shortRev or "dev";
+
+            cargoLock = {
+              lockFile = ./Cargo.lock;
+              allowBuiltinFetchGit = true;
+            };
+
+            meta.mainProgram = "printi";
           };
 
-          meta.mainProgram = "printi";
+          docker = pkgs.dockerTools.buildLayeredImage {
+            name = "printi";
+            tag = "latest";
+            contents = [ bin ];
+            config = {
+              WorkingDir = "/workdir";
+              Entrypoint = "/bin/printi";
+            };
+          };
         };
 
         devShells.default = pkgs.mkShell {
