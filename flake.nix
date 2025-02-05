@@ -32,6 +32,8 @@
             clang
             pkg-config
             rustPlatform.bindgenHook
+            libllvm
+            makeWrapper
           ];
 
           buildInputs = with pkgs; [ opencv4WithoutCuda ];
@@ -62,6 +64,12 @@
                 lockFile = ./Cargo.lock;
                 allowBuiltinFetchGit = true;
               };
+
+              postFixup = ''
+                llvm-strip $out/bin/${binname}
+                wrapProgram $out/bin/${binname} \
+                  --prefix GST_PLUGIN_SYSTEM_PATH_1_0 : ${GST_PLUGIN_SYSTEM_PATH_1_0}
+              '';
             };
 
             docker = pkgs.dockerTools.buildLayeredImage {

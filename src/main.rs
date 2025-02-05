@@ -41,13 +41,6 @@ fn run(opt: cli::Opt) -> Result<()> {
         return Ok(());
     }
 
-    if let Some(gst_plugin_path) = option_env!("GST_PLUGIN_SYSTEM_PATH_1_0") {
-        // For Nix
-        if std::env::var_os("GST_PLUGIN_SYSTEM_PATH_1_0").is_none() {
-            std::env::set_var("GST_PLUGIN_SYSTEM_PATH_1_0", gst_plugin_path)
-        }
-    }
-
     if !opt.verbose {
         util::suppress_stderr()
     }
