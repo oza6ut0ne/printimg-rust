@@ -3,79 +3,98 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
+    flake-parts.url = "github:hercules-ci/flake-parts";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = inputs@{ self, ... }:
-    inputs.flake-utils.lib.eachDefaultSystem (system:
-      let
-        overlays = [ (import inputs.rust-overlay) ];
-        pkgs = import (inputs.nixpkgs) { inherit system overlays; };
+  outputs =
+    inputs@{ self, ... }:
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
+      perSystem =
+        { system, ... }:
+        let
+          name = "printimg";
+          pname = name;
+          binname = "printi";
+          overlays = [ (import inputs.rust-overlay) ];
+          pkgs = import inputs.nixpkgs { inherit system overlays; };
 
-        nativeBuildInputs = with pkgs; [
-          clang
-          pkg-config
-          rustPlatform.bindgenHook
-        ];
+          nativeBuildInputs = with pkgs; [
+            clang
+            pkg-config
+            rustPlatform.bindgenHook
+          ];
 
-        buildInputs = with pkgs; [ opencv4WithoutCuda ];
+          buildInputs = with pkgs; [ opencv4WithoutCuda ];
 
-        rustPlatform = pkgs.makeRustPlatform {
-          cargo = pkgs.rust-bin.stable.latest.minimal;
-          rustc = pkgs.rust-bin.stable.latest.minimal;
-        };
+          rustPlatform = pkgs.makeRustPlatform {
+            cargo = pkgs.rust-bin.stable.latest.minimal;
+            rustc = pkgs.rust-bin.stable.latest.minimal;
+          };
 
-        GST_PLUGIN_SYSTEM_PATH_1_0 = with pkgs.gst_all_1;
-          "${gstreamer.out}/lib/gstreamer-1.0:${gst-plugins-base}/lib/gstreamer-1.0:${gst-plugins-good}/lib/gstreamer-1.0";
-      in {
-        packages = rec {
-          default = bin;
+          GST_PLUGIN_SYSTEM_PATH_1_0 =
+            with pkgs.gst_all_1;
+            "${gstreamer.out}/lib/gstreamer-1.0:${gst-plugins-base}/lib/gstreamer-1.0:${gst-plugins-good}/lib/gstreamer-1.0";
+        in
+        {
+          packages = rec {
+            default = bin;
 
-          bin = rustPlatform.buildRustPackage {
-            inherit buildInputs nativeBuildInputs;
+            bin = rustPlatform.buildRustPackage {
+              inherit name pname;
+              inherit buildInputs nativeBuildInputs;
+              inherit GST_PLUGIN_SYSTEM_PATH_1_0;
+
+              src = ./.;
+              version = self.shortRev or self.dirtyShortRev or "dev";
+              meta.mainProgram = binname;
+
+              cargoLock = {
+                lockFile = ./Cargo.lock;
+                allowBuiltinFetchGit = true;
+              };
+            };
+
+            docker = pkgs.dockerTools.buildLayeredImage {
+              name = binname;
+              tag = "latest";
+              contents = [ bin ];
+              config = {
+                WorkingDir = "/workdir";
+                Entrypoint = "/bin/${binname}";
+              };
+            };
+          };
+
+          devShells.default = pkgs.mkShell {
+            inherit name;
+            inherit nativeBuildInputs;
             inherit GST_PLUGIN_SYSTEM_PATH_1_0;
 
-            name = "printimg";
-            src = ./.;
-            version = self.shortRev or "dev";
+            buildInputs =
+              buildInputs
+              ++ (with pkgs.rust-bin; [
+                (stable.latest.minimal.override {
+                  extensions = [
+                    "clippy"
+                    "rust-src"
+                  ];
+                })
+                nightly.latest.rustfmt
+                nightly.latest.rust-analyzer
+              ]);
 
-            cargoLock = {
-              lockFile = ./Cargo.lock;
-              allowBuiltinFetchGit = true;
-            };
-
-            meta.mainProgram = "printi";
-          };
-
-          docker = pkgs.dockerTools.buildLayeredImage {
-            name = "printi";
-            tag = "latest";
-            contents = [ bin ];
-            config = {
-              WorkingDir = "/workdir";
-              Entrypoint = "/bin/printi";
-            };
+            RUST_BACKTRACE = 1;
           };
         };
-
-        devShells.default = pkgs.mkShell {
-          name = "printimg-shell";
-          inherit nativeBuildInputs;
-          inherit GST_PLUGIN_SYSTEM_PATH_1_0;
-
-          buildInputs = buildInputs ++ (with pkgs.rust-bin; [
-            (stable.latest.minimal.override {
-              extensions = [ "clippy" "rust-src" ];
-            })
-            nightly.latest.rustfmt
-            nightly.latest.rust-analyzer
-          ]);
-
-          RUST_BACKTRACE = 1;
-        };
-      });
+    };
 }
