@@ -3,9 +3,19 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    flake-parts.url = "github:hercules-ci/flake-parts";
+
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
+
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nix-appimage = {
+      url = "github:ralismark/nix-appimage";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -70,6 +80,10 @@
                 wrapProgram $out/bin/${binname} \
                   --prefix GST_PLUGIN_SYSTEM_PATH_1_0 : ${GST_PLUGIN_SYSTEM_PATH_1_0}
               '';
+            };
+
+            appimage = inputs.nix-appimage.lib.${system}.mkAppImage {
+              program = "${bin.out}/bin/${binname}";
             };
 
             docker = pkgs.dockerTools.buildLayeredImage {
